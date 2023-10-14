@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -7,8 +8,10 @@ public class GameManager : MonoBehaviour
     public GameObject lane1;
     IBowlingLane bowlingLane1;
     public List<Frame> frames = new List<Frame>();
-  //  public TextMeshProUGUI[] firstRollScoreBoard = new TextMeshProUGUI[10];
-   // public TextMeshProUGUI[] secondRollScoreBoard = new TextMeshProUGUI[10];
+    public TextMeshProUGUI[] firstRollScoreBoard = new TextMeshProUGUI[10];
+    public TextMeshProUGUI[] secondRollScoreBoard = new TextMeshProUGUI[10];
+    public TextMeshProUGUI[] overallFrameScoreBoard = new TextMeshProUGUI[10];
+    public TextMeshProUGUI totalScorePanel = new TextMeshProUGUI();
 
     private int currentFrame = 0;
     private int currentRoll = 0;
@@ -36,6 +39,15 @@ public class GameManager : MonoBehaviour
         // Reset the bowling lane and move to the next frame
         bowlingLane1.ResetLane();
         currentFrame++;
+        CheckIfLastFrame();
+    }
+
+    private void CheckIfLastFrame()
+    {
+        if (currentFrame >= framesNum)
+        {
+            CountTotalScore();
+        }
     }
 
     public void NextRoll(int knockedDownCount)
@@ -64,7 +76,6 @@ public class GameManager : MonoBehaviour
             if ((frames[currentFrame].FirstRoll + frames[currentFrame].SecondRoll >= 10 || currentRoll > 1))
             {
                 currentRoll = FirstRollIndex;
-                //UpdateUI();
                 NextFrame();
             }
             else
@@ -82,33 +93,43 @@ public class GameManager : MonoBehaviour
 
     public void UpdateUIPro()
     {
-       /* if (currentRoll == 0)
+        if (currentRoll == 0)
         {
-            if (frames[currentFrame].FirstRoll == 10)
-            {
-                firstRollScoreBoard[currentFrame].text = "X";
-            }
-            else
-            {              
-                firstRollScoreBoard[currentFrame].text = frames[currentFrame].FirstRoll.ToString();
-            }
-
+            CountScoreForTheFirstRoll();
+            CountScoreInCurrentFrame();
         }
 
         if (currentRoll == 1)
         {
-            if (frames[currentFrame].SumOfRolls() >= 10)
-            {
-                secondRollScoreBoard[currentFrame].text = "/";
-            }
-            else
-            {
-                secondRollScoreBoard[currentFrame].text = frames[currentFrame].SecondRoll.ToString();
-            }            
-        }*/
+            CountScoreForTheSecondRoll();
+            CountScoreInCurrentFrame();
+        }
     }
 
-
+    private void CountScoreForTheFirstRoll()
+    {
+        if (frames[currentFrame].FirstRoll == 10)
+        {
+            firstRollScoreBoard[currentFrame].text = "X";
+        }
+        else
+        {
+            firstRollScoreBoard[currentFrame].text = frames[currentFrame].FirstRoll.ToString();
+        }     
+    }
+    private void CountScoreForTheSecondRoll()
+    {
+        if (frames[currentFrame].SumOfRolls() == 10)
+        {
+            secondRollScoreBoard[currentFrame].text = "/";
+        }
+        else
+        {
+            secondRollScoreBoard[currentFrame].text = frames[currentFrame].SecondRoll.ToString();
+        }      
+    }
+    private void CountScoreInCurrentFrame() => overallFrameScoreBoard[currentFrame].text = frames.Select(x => x.SumOfRolls()).Sum().ToString();
+    public void CountTotalScore() => totalScorePanel.text =  frames.Select(x => x.SumOfRolls()).Sum().ToString();
 
   
 }
